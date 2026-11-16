@@ -9,3 +9,8 @@ Expected dry-run result:
 The rejected examples cover a repeated event ID, unknown actor, invalid timestamp, unsupported event type, invalid IP address, malformed JSON payload, and missing entity ID. The accepted + rejected totals reconcile to the source counts.
 
 All timestamps are stored as UTC after parsing. The naive sample timestamp is explicitly assumed to be UTC; production migrations must validate this assumption with the source system owner.
+
+
+## Database integration
+
+The CI run performs a real load into a disposable MySQL 8.0 service and verifies 8 actors, 18 events, one system event with a NULL actor foreign key, valid JSON payloads, and no orphan user references. No production data or database is used.
