@@ -30,6 +30,12 @@ mysql -u root -p < sql/001_create_schema.sql
 PYTHONPATH=src python -m activity_migration.main --input data/source/activity_history.xlsx
 ```
 
+## Visual overview
+
+![Activity migration architecture](docs/architecture.svg)
+
+![Sample validation summary](docs/quality-summary.svg)
+
 ## Migration rules
 
 - Normalize event IDs, event types, entity references, and actor IDs.
