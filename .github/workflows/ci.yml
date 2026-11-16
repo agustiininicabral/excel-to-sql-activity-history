@@ -6,8 +6,27 @@ on:
 permissions:
   contents: read
 jobs:
-  validate:
+  validate-and-migrate:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: activity_migration
+      DB_USER: root
+      DB_PASSWORD: root
+      PYTHONPATH: src
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,10 +38,14 @@ jobs:
         run: python scripts/generate_sample_workbook.py
       - name: Run automated tests
         run: pytest
-      - name: Validate workbook and run dry-run
+      - name: Validate workbook and dry-run
         run: python -m activity_migration.main --dry-run --input data/source/activity_history.xlsx
-        env:
-          PYTHONPATH: src
+      - name: Apply MySQL 8.0 schema
+        run: python scripts/apply_schema.py
+      - name: Execute real activity migration
+        run: python -m activity_migration.main --input data/source/activity_history.xlsx
+      - name: Verify persisted events and audit integrity
+        run: python scripts/verify_database.py
       - name: Upload validation reports
         if: always()
         uses: actions/upload-artifact@v4
