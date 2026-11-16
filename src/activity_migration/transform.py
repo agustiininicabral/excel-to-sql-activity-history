@@ -91,6 +91,9 @@ def transform_workbook(path: str | Path):
         if reasons: event_rejected.append({**record,"rejection_reason":"|".join(reasons)})
         else:
             seen_events.add(event_id); events.append(record)
-    accepted={"actors":pd.DataFrame(actors),"activity_logs":pd.DataFrame(events)}
+    event_frame=pd.DataFrame(events)
+    if not event_frame.empty:
+        event_frame["actor_user_id"]=pd.Series([row["actor_user_id"] for row in events],dtype=object)
+    accepted={"actors":pd.DataFrame(actors),"activity_logs":event_frame}
     rejected={"actors":pd.DataFrame(actor_rejected),"activity_logs":pd.DataFrame(event_rejected)}
     return accepted,rejected,{"actors":len(actors_raw),"activity_logs":len(events_raw)}
