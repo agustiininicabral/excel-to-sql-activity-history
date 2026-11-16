@@ -49,7 +49,7 @@ PYTHONPATH=src python -m activity_migration.main --input data/source/activity_hi
 
 `data/` sample Excel workbook; `src/` parsing, validation, and MySQL loader; `sql/` schema and audit queries; `tests/` automated checks; `docs/` data dictionary, design, quality report, and diagrams.
 
-Run `pytest`. GitHub Actions regenerates the workbook, runs tests and a dry-run, then uploads accepted/rejected reports as a workflow artifact.
+Run `pytest`. GitHub Actions starts an ephemeral MySQL 8.0 service, regenerates the workbook, runs tests and a dry-run, applies the schema, loads actors and events, verifies persisted counts and audit integrity, then uploads accepted/rejected reports as a workflow artifact. `scripts/apply_schema.py` and `scripts/verify_database.py` reproduce the database checks.
 
 ## Limitations
 
